@@ -116,7 +116,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j + 1;
 			if (x< 5 && y < 5)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 				
 			}
@@ -124,7 +124,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 1;
 			if (x < 5 && y > 0)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -132,7 +132,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j + 1;
 			if (x > 0 && y < 5)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -140,7 +140,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 1;
 			if (x > 0 && y > 0)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -148,7 +148,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j + 2;
 			if (x < 5 && y < 5)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -156,7 +156,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j + 2;
 			if (x > 0 && y < 5)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -164,7 +164,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 2;
 			if (x < 5 && y > 0)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -172,7 +172,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 2;
 			if (x > 0 && y > 0)
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
