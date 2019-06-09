@@ -95,6 +95,7 @@ void dodaj_krawedz(int v1, int v2, lista *p)
 	p->K = v2;          // Numerujemy go jako v2
 	p->next = A[v1]; // Dodajemy go na początek listy A[v1]
 	A[v1] = p;
+	// graf jest kierunkowy jak by nie był to mozna to odkomentować
 	/*p = new lista;    // Tworzymy nowy element
 	p->K = v1;          // Numerujemy go jako v1
 	p->next = A[v2];    // Dodajemy go na początek listy A[v2]
