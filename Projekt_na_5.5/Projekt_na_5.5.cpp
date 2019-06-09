@@ -65,19 +65,28 @@ public:
 
 
 
-int wierzcholki = 16; // ilosc wierzchołków w grafie
+int wierzcholki = 25; // ilosc wierzchołków w grafie
 
 lista ** A;// lista sąsiedztwa
 
 // tablica inteksów pól na planszy 
-int tab[4][4] =
+int tab[5][5] =
+{
+	0,1,2,3,4,
+	5,6,7,8,9,
+	10,11,12,13,14,
+	15,16,17,18,19,
+	20,21,22,23,24
+
+};
+/*int tab[4][4] =
 {
 	0,1,2,3,
 	4,5,6,7,
 	8,9,10,11,
 	12,13,14,15
 
-};
+};*/
 
 // dodawanie krawedzi do grafu
 void dodaj_krawedz(int v1, int v2, lista *p)
@@ -86,10 +95,10 @@ void dodaj_krawedz(int v1, int v2, lista *p)
 	p->K = v2;          // Numerujemy go jako v2
 	p->next = A[v1]; // Dodajemy go na początek listy A[v1]
 	A[v1] = p;
-	p = new lista;    // Tworzymy nowy element
+	/*p = new lista;    // Tworzymy nowy element
 	p->K = v1;          // Numerujemy go jako v1
 	p->next = A[v2];    // Dodajemy go na początek listy A[v2]
-	A[v2] = p;
+	A[v2] = p;*/
 }
 
 // tworzy graf z połączeniem wszsytkich możliwych ruchów skoczka z każdego możliwego pola.
@@ -98,28 +107,31 @@ void ruch_skoczka(lista ** A, lista *p)
 	int x, y; // zmienen okreslajace współżedne analizowanego ruchu
 
 	// fory przechodzace przez wszystkie pola i określajace jakie ruchy z kazdego pola moze wykonać skoczek
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < 5; j++)
 		{
 			x = i + 2;
 			y = j + 1;
-			if (x< 4 && y < 4)
+			if (x< 5 && y < 5)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 				
 			}
 			x = i + 2;
 			y = j - 1;
-			if (x < 4 && y > 0)
+			if (x < 5 && y > 0)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 2;
 			y = j + 1;
-			if (x > 0 && y < 4)
+			if (x > 0 && y < 5)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -127,27 +139,31 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 1;
 			if (x > 0 && y > 0)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
 			x = i + 1;
 			y = j + 2;
-			if (x < 4 && y < 4)
+			if (x < 5 && y < 5)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 1;
 			y = j + 2;
-			if (x > 0 && y < 4)
+			if (x > 0 && y < 5)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
 			x = i + 1;
 			y = j - 2;
-			if (x < 4 && y > 0)
+			if (x < 5 && y > 0)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -155,6 +171,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			y = j - 2;
 			if (x > 0 && y > 0)
 			{
+				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0))
 				dodaj_krawedz(tab[i][j], tab[x][y], p);
 
 			}
@@ -280,7 +297,7 @@ int main()
 	// tworzenie grafu 
 	tworzenie_grafu();
 	// szukanie ścieżki 
-	DFS_Droga(13, 1);
+	DFS_Droga(22, 7);
 
 	return 0;
 }
