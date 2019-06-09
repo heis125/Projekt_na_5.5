@@ -223,7 +223,7 @@ void tworzenie_grafu()
 }
 
 // przeszukiwanie w głąb grafu 
-void DFS_Droga(int poczatkowy, int koncowy)
+void DFS(int poczatkowy, int koncowy)
 {
 	stos S,W; // stos sprawdzajacy
 	bool * odwiedzone, znaleziono; // tablica odwiedzonych pól i zmienna okeslajaca czy znaleziono szukane pole
@@ -244,10 +244,7 @@ void DFS_Droga(int poczatkowy, int koncowy)
 	odwiedzone[poczatkowy] = true;
 	//	pierwszy element nie jest szukanym 
 	znaleziono = false;
-	// tablica do zamienienia kolejnosci ścieżki metoda do poprawienie powinna dzialać lepiej 
-	int tab[50];
-	// zmienna do określenia ilosci elementów ścieżce 
-	int a = 0;
+
 	 // dopuki stos nie jest pusty 
 	while (!S.empty())
 	{
@@ -280,17 +277,13 @@ void DFS_Droga(int poczatkowy, int koncowy)
 		// dopuki nie bedzie elementu 
 		while (v > -1)
 		{
-			tab[a] = v;
 			W.push(v);
-			//cout << v << " ";
 			v = P[v];
-			// sprawdzanie ile jest elementów scieżki 
-			a++;
 		}
 		// wyświetlenie ścieżki w kolejnosci przechodzenia
-		for (int i = a-1; i >= 0; i--)
+		while(!W.empty())
 		{
-			cout << "Wartosc H: " << A[tab[i]]->H << " dla wierzcholka: " << tab[i] << " ze stosu: " << W.top() << endl;
+			cout << "Wartosc H: " << A[W.top()]->H << " dla wierzcholka: " << W.top() << endl;
 			W.pop();
 			
 		}
@@ -306,7 +299,7 @@ int main()
 	// tworzenie grafu 
 	tworzenie_grafu();
 	// szukanie ścieżki 
-	DFS_Droga(22, 7);
+	DFS(22, 7);
 
 	return 0;
 }
