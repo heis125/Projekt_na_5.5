@@ -89,10 +89,11 @@ int tab[5][5] =
 };*/
 
 // dodawanie krawedzi do grafu
-void dodaj_krawedz(int v1, int v2, lista *p)
+void dodaj_krawedz(int x, int y ,int v1, int v2, lista *p)
 {
 	p = new lista;    // Tworzymy nowy element
-	p->K = v2;          // Numerujemy go jako v2
+	p->K = v2;   // Numerujemy go jako v2
+	p->H = abs(x - 1) + abs(y - 2);
 	p->next = A[v1]; // Dodajemy go na początek listy A[v1]
 	A[v1] = p;
 	// graf jest kierunkowy jak by nie był to mozna to odkomentować
@@ -117,7 +118,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x< 5 && y < 5)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+				dodaj_krawedz(i,j,tab[i][j], tab[x][y], p);
 				
 			}
 			x = i + 2;
@@ -125,7 +126,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x < 5 && y > 0)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+				dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 2;
@@ -133,7 +134,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x > 0 && y < 5)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+				dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 2;
@@ -141,7 +142,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x > 0 && y > 0)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i + 1;
@@ -149,7 +150,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x < 5 && y < 5)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 1;
@@ -157,7 +158,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x > 0 && y < 5)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i + 1;
@@ -165,7 +166,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x < 5 && y > 0)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 			x = i - 1;
@@ -173,7 +174,7 @@ void ruch_skoczka(lista ** A, lista *p)
 			if (x > 0 && y > 0)
 			{
 				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(tab[i][j], tab[x][y], p);
+					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
 
 			}
 		}
@@ -287,10 +288,12 @@ void DFS_Droga(int poczatkowy, int koncowy)
 		// wyświetlenie ścieżki w kolejnosci przechodzenia
 		for (int i = a-1; i >= 0; i--)
 		{
-			cout << tab[i] << " ";
+			cout << "Wartosc H: " << A[tab[i]]->H << " dla wierzcholka: " << tab[i] << endl;
+			
 		}
 		cout << endl;
 	}
+	// usuwanie tablic dynamicznych 
 	delete[] P;
 	delete[] odwiedzone;
 }
