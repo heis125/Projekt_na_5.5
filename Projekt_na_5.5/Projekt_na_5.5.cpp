@@ -8,7 +8,7 @@
 using namespace std;
 
 
-
+// struktura listy 
 struct lista
 {
 public:
@@ -17,27 +17,33 @@ public:
 	int H ,G, F; // H - wartość funkcji heurestycznej ; G - wartosc okreslonej ilosci kroków ; F = H+G;
 };
 
+// implementacja stosu wraz z funkcjami 
 class stos
 {
 private:
 	lista *S;
 public:
+	// konstruktor
 	stos()
 	{
 		S = NULL;
 	}
+	// destruktor
 	~stos()
 	{
 		while(S)  pop();
 	}
+	// sprawdzenie czy pusty 
 	bool empty()
 	{
 		return !S;
 	}
+	// zwaracanie watrości z góry stosu 
 	int top()
 	{
 		return S->K;
 	}
+	// dodawanie elementu na stos
 	void push(int to)
 	{
 		lista *tmp = new lista;
@@ -45,6 +51,7 @@ public:
 		tmp->next = S;
 		S = tmp;
 	}
+	// usuwanie górnego elementu ze stosu 
 	void pop()
 	{
 		if (S)
