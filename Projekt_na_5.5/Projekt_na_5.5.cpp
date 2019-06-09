@@ -291,6 +291,8 @@ void DFS_Droga(int poczatkowy, int koncowy)
 		}
 		cout << endl;
 	}
+	delete[] P;
+	delete[] odwiedzone;
 }
 
 int main()
