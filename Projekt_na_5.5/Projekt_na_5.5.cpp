@@ -14,7 +14,8 @@ struct lista
 public:
 	lista *next;
 	int K;
-	int H ,G, F; // H - wartość funkcji heurestycznej ; G - wartosc okreslonej ilosci kroków ; F = H+G;
+	int H ,G;
+	int F = H + G;// H - wartość funkcji heurestycznej ; G - wartosc okreslonej ilosci kroków ; F = H+G;
 };
 
 // implementacja stosu wraz z funkcjami 
@@ -224,7 +225,7 @@ void tworzenie_grafu()
 // przeszukiwanie w głąb grafu 
 void DFS_Droga(int poczatkowy, int koncowy)
 {
-	stos S; // stos sprawdzajacy
+	stos S,W; // stos sprawdzajacy
 	bool * odwiedzone, znaleziono; // tablica odwiedzonych pól i zmienna okeslajaca czy znaleziono szukane pole
 	int *P, v, u; // zmienne 
 	lista * pv; // lista pomocnicza wykożystana przy przeszukiwaniu sąsiadów 
@@ -280,6 +281,7 @@ void DFS_Droga(int poczatkowy, int koncowy)
 		while (v > -1)
 		{
 			tab[a] = v;
+			W.push(v);
 			//cout << v << " ";
 			v = P[v];
 			// sprawdzanie ile jest elementów scieżki 
@@ -288,7 +290,8 @@ void DFS_Droga(int poczatkowy, int koncowy)
 		// wyświetlenie ścieżki w kolejnosci przechodzenia
 		for (int i = a-1; i >= 0; i--)
 		{
-			cout << "Wartosc H: " << A[tab[i]]->H << " dla wierzcholka: " << tab[i] << endl;
+			cout << "Wartosc H: " << A[tab[i]]->H << " dla wierzcholka: " << tab[i] << " ze stosu: " << W.top() << endl;
+			W.pop();
 			
 		}
 		cout << endl;
