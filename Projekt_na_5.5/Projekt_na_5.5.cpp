@@ -1,21 +1,55 @@
-﻿// Projekt_na_5.5.cpp : Ten plik zawiera funkcję „main”. W nim rozpoczyna się i kończy wykonywanie programu.
-//
+﻿/*********************************************************************************************************************************************************************/
+/*                                                        Przeszukiwanie algorytmem DFS ORAZ A*                                                                      */
+/*                                                                                                                                                                   */
+/*********************************************************************************************************************************************************************/
+
 
 #include "pch.h"
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <set>
+#include <vector>
 using namespace std;
+
+#define ROZMIAR 5				//definicja rozmiaru planszy
+#define WIERZCHOLKI 25			//określenie ilosci wierzcholków 
+#define INF 999999999			// wartosc nieskonczona 
+
+
+
+// tablica inteksów pól na planszy 
+int tab[ROZMIAR][ROZMIAR] =
+{
+	0, 1, 2, 3, 4,
+	5 ,6, 7, 8, 9,
+	10,11,12,13,14,
+	15,16,17,18,19,
+	20,21,22,23,24
+};
+
+
+
+int* f_wartosc;				// wskaźnik przechowujacy wartość funkcji f(n) = h(n)+g(n)  dla każdego wezła. Staramy sie aby f(n) było jak najmniejsze
+int* g_wartosc;				// wskaźnik przechowujacy  wartość funkcji g(n) przechowującej ilość sprawdzonych już wierzchołków  
+int* h_wartosc;				// wskaźnik przechowujacy  wartość funkcji heurystycznej h(n) której wzór został określony w instrukcji do projektu 
+int* poprzednik;			// wskaźnik na tablicę poprzedników przechowujacą numer wierzchołka poprzedniego elementy
+
+// zmienne do wygenerowania i sprawdzenia wszsytkich mozliwych ruchów skoczka z danego pola 
+int dx[8] = { 1, 1, 2, 2, -1, -1, -2, -2 };
+int dy[8] = { 2, -2, 1, -1, 2, -2, 1, -1 };
+
+//Tworzenie grafu przechowującego identyfikatry sąsiadów dla określonego wierzchołka 
+vector<int> graf[WIERZCHOLKI];
+
 
 
 // struktura listy 
 struct lista
 {
 public:
-	lista *next;
-	int K;
-	int H ,G;
-	int F = H + G;// H - wartość funkcji heurestycznej ; G - wartosc okreslonej ilosci kroków ; F = H+G;
+	lista *next; // wskaźnik na kolejny element listy
+	int K;		// numer wierzchołka 
 };
 
 // implementacja stosu wraz z funkcjami 
@@ -32,7 +66,7 @@ public:
 	// destruktor
 	~stos()
 	{
-		while(S)  pop();
+		while (S)  pop();
 	}
 	// sprawdzenie czy pusty 
 	bool empty()
@@ -66,186 +100,217 @@ public:
 
 
 
-int wierzcholki = 25; // ilosc wierzchołków w grafie
 
-lista ** A;// lista sąsiedztwa
 
-// tablica inteksów pól na planszy 
-int tab[5][5] =
+// funkcja wyświetlająca graf
+void wyswietlGraf()
 {
-	0,1,2,3,4,
-	5,6,7,8,9,
-	10,11,12,13,14,
-	15,16,17,18,19,
-	20,21,22,23,24
+	cout << "GRAF: " << endl;
+	for (int i = 0; i < WIERZCHOLKI; i++)
+	{
 
-};
-/*int tab[4][4] =
-{
-	0,1,2,3,
-	4,5,6,7,
-	8,9,10,11,
-	12,13,14,15
-
-};*/
-
-// dodawanie krawedzi do grafu
-void dodaj_krawedz(int x, int y ,int v1, int v2, lista *p)
-{
-	p = new lista;    // Tworzymy nowy element
-	p->K = v2;   // Numerujemy go jako v2
-	p->H = abs(x - 1) + abs(y - 2);
-	p->next = A[v1]; // Dodajemy go na początek listy A[v1]
-	A[v1] = p;
-	// graf jest kierunkowy jak by nie był to mozna to odkomentować
-	/*p = new lista;    // Tworzymy nowy element
-	p->K = v1;          // Numerujemy go jako v1
-	p->next = A[v2];    // Dodajemy go na początek listy A[v2]
-	A[v2] = p;*/
+		cout << i << ": ";
+		for (int k = 0; k < graf[i].size(); k++)
+		{
+			cout << graf[i][k] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl << endl;
 }
 
-// tworzy graf z połączeniem wszsytkich możliwych ruchów skoczka z każdego możliwego pola.
-void ruch_skoczka(lista ** A, lista *p)
+// tworzenie grafu
+void zbudujGraf()
 {
-	int x, y; // zmienen okreslajace współżedne analizowanego ruchu
-
-	// fory przechodzace przez wszystkie pola i określajace jakie ruchy z kazdego pola moze wykonać skoczek
-	for (int i = 0; i < 5; i++)
+	// określenie współrzędnych króla na planszy
+	int x_krola, y_krola, x_wieży, y_wieży;
+	x_krola = 1;
+	y_krola = 2;
+	x_wieży = 0;
+	y_wieży = 0;
+	// dla każdego pola sprawdzamy możliwe ruchy 
+	for (int i = 0; i < ROZMIAR; i++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int j = 0; j < ROZMIAR; j++)
 		{
-			x = i + 2;
-			y = j + 1;
-			if (x< 5 && y < 5)
+			for (int k = 0; k < 8; k++) // sprawdzenie wszystkich 8 ruchów 
 			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(i,j,tab[i][j], tab[x][y], p);
-				
-			}
-			x = i + 2;
-			y = j - 1;
-			if (x < 5 && y > 0)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i - 2;
-			y = j + 1;
-			if (x > 0 && y < 5)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-				dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i - 2;
-			y = j - 1;
-			if (x > 0 && y > 0)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i + 1;
-			y = j + 2;
-			if (x < 5 && y < 5)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i - 1;
-			y = j + 2;
-			if (x > 0 && y < 5)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i + 1;
-			y = j - 2;
-			if (x < 5 && y > 0)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
-			}
-			x = i - 1;
-			y = j - 2;
-			if (x > 0 && y > 0)
-			{
-				if ((tab[x][y] % 5) != 0 && (tab[x][y] > 4 || tab[x][y] == 0)) // sprawdzenie czy nie jest w lini ataku wieży
-					dodaj_krawedz(i, j, tab[i][j], tab[x][y], p);
-
+				int nowy_x = i + dy[k];
+				int nowy_y = j + dx[k];
+				if (nowy_x >= 0 && nowy_x <= 4 && nowy_y >= 0 && nowy_y <= 4)// musi stać na planszy 
+				{
+					if ((nowy_y != y_wieży && nowy_x != x_wieży) || (nowy_y == y_wieży && nowy_x == x_wieży))  // nie może stać w tej samej kolumnie ani wierszu co wieża ale może  stać na polu wieży 
+					{
+						graf[tab[i][j]].push_back(tab[nowy_x][nowy_y]); // jeśli wszsytkie warunki spełnione dodajemy do grafu
+					}
+				}
 			}
 		}
 	}
-	
+
+	//stworzenie tablic dla funkcji okrteślonych w instrukcji oraz tablicy poprzedników 
+	f_wartosc = new int[WIERZCHOLKI];
+	g_wartosc = new int[WIERZCHOLKI];
+	h_wartosc = new int[WIERZCHOLKI];
+	poprzednik = new int[WIERZCHOLKI];
+
+	//określenie ich wartości funkcji dla każdego wierzchołka oraz przydzielenie współrzędnych do tablicy poprzedników 
+	for (int i = 0; i < ROZMIAR; i++)
+	{
+		for (int j = 0; j < ROZMIAR; j++)
+		{
+			h_wartosc[tab[i][j]] = abs(x_krola - i) + abs(y_krola - j);
+			g_wartosc[tab[i][j]] = INF;
+			f_wartosc[tab[i][j]] = INF;
+			poprzednik[tab[i][j]] = tab[i][j];
+		}
+	}
 }
 
-void tworzenie_grafu()
+// usuwanie wszystkich dynamicznych zmiennych
+void usunGraf()
+
 {
-	lista * p;
-	p = new lista;
 
-	A = new lista *[wierzcholki]; // tworzenie listy sasiedztwa
-	for (int i = 0; i < wierzcholki; i++)
-		A[i] = NULL; // wypełniamy ją pustymi listami 
-
-	//wczesniejsze dodanie krawedzi zanim wymysliłem jak dodac je lepiej 
-	/*dodaj_krawedz(0, 6, p);
-	dodaj_krawedz(0, 9, p);
-	dodaj_krawedz(3, 10, p);
-	dodaj_krawedz(3, 5, p);
-	dodaj_krawedz(15, 9, p);
-	dodaj_krawedz(15, 6, p);
-	dodaj_krawedz(12, 5, p);
-	dodaj_krawedz(12, 10, p);
-	dodaj_krawedz(5, 14, p);
-	dodaj_krawedz(5, 11, p);
-	dodaj_krawedz(6, 8, p);
-	dodaj_krawedz(6, 13, p);
-	dodaj_krawedz(9, 7, p);
-	dodaj_krawedz(9, 2, p);
-	dodaj_krawedz(10, 1, p);
-	dodaj_krawedz(10, 4, p);
-	dodaj_krawedz(4, 2, p);
-	dodaj_krawedz(4,13, p);
-	dodaj_krawedz(1, 8, p);
-	dodaj_krawedz(1, 7, p);
-	dodaj_krawedz(11, 2, p);
-	dodaj_krawedz(11, 13, p);
-	dodaj_krawedz(14, 8, p);
-	dodaj_krawedz(14, 7, p);*/
-
-	// wygenerowanie grafu 
-	ruch_skoczka(A, p);
+	delete[] f_wartosc;
+	delete[] g_wartosc;
+	delete[] h_wartosc;
+	delete[] poprzednik;
 }
+
+// funkcja wybierajaca pare której wartość funkcji f jest minimalna
+int wybierzNajmniejsza(set<int> & nieodwiedzone)
+{
+	int najmniejsza;
+	int najmniejsza_wartosc = INF * 2;
+	for (auto iter = nieodwiedzone.begin(); iter != nieodwiedzone.end(); iter++)
+	{
+		int wierzcholek = *iter;
+		if (f_wartosc[wierzcholek] < najmniejsza_wartosc)
+		{
+			najmniejsza_wartosc = f_wartosc[wierzcholek];
+			najmniejsza = wierzcholek;
+		}
+	}
+	return najmniejsza;
+}
+
+
+// funkcja odbudowujaca ścieżkę przejscia do danego wierzchołka
+void odbudujSciezke(int obecny)
+{
+	vector<int> sciezka;
+	while (poprzednik[obecny] != obecny)
+	{
+		sciezka.push_back(obecny);
+		obecny = poprzednik[obecny];
+	}
+	sciezka.push_back(obecny);
+	// jeśli algorytm A* znalazł ścieżkę wyświetlamy ją
+	cout << "Sciezka A*: " << endl;
+	for (int i = sciezka.size() - 1; i >= 0; i--)
+	{
+
+		cout << sciezka.size() - i << "  Wierzcholek nr:" << sciezka[i] << " f(n)=" << f_wartosc[sciezka[i]] << " h(n)=" << h_wartosc[sciezka[i]] << " g(n)=" << g_wartosc[sciezka[i]] << endl;
+
+	}
+	cout << endl;
+	return;
+}
+
+// główna funkcja dla algorytmu A*
+void AStar(int start, int cel)
+{
+	// określenie ilości wykonanych kroków w przeszukiwaniu  na 0 bo jeszcze się nie ruszyliśmy 
+	int niepewnaWartoscG = 0;
+
+	set<int> przejrzane; // inicjowanie zbioru elementów już przejrzanych
+	set<int> nieodwiedzone; // inicjowanie zbioru elementów jeszcze nieodwiedzonych
+
+	// dodajemy poczatkowy do zbioru nieodwiedzonych 
+	nieodwiedzone.insert(start);
+	g_wartosc[start] = 0;
+	f_wartosc[start] = g_wartosc[start] + h_wartosc[start];
+
+	// resetowanie wartości w tablicy poprzedników 
+	for (int i = 0; i < WIERZCHOLKI; i++)
+		poprzednik[i] = i;
+	// dopuki nie odwiedzimy wszystich 
+	while (!nieodwiedzone.empty())
+	{
+
+		int obecny = wybierzNajmniejsza(nieodwiedzone);
+
+		//jeśli znajdziemy wierzchołek docelowy to koniec
+		if (obecny == cel)
+		{
+			odbudujSciezke(cel);
+			return;
+
+		}
+		// aktualny wierzchołek dodajemy do przejrzanych i zabieramy z nieodwiedzonych 
+		nieodwiedzone.erase(obecny);
+		przejrzane.insert(obecny);
+		// sprawdzamy wszystkich sąsiadów 
+		for (int i = 0; i < (graf[obecny].size()); i++)
+		{
+			int sprawdzany = graf[obecny][i];
+			//sprawdzamy czy jest w liście przejrzanych 
+			if (przejrzane.find(sprawdzany) != przejrzane.end())
+			{
+				continue;
+			}
+			niepewnaWartoscG = niepewnaWartoscG + 1; // za każdym sprawdzeniem zwiększamy licznik
+			bool czyNiepewnaLepsza = false;
+			// sprawdzamy czy sprawdzany jest w liscie nieodwiedzonych
+			if (nieodwiedzone.find(sprawdzany) == nieodwiedzone.end())
+			{
+				nieodwiedzone.insert(sprawdzany);
+				czyNiepewnaLepsza = true;
+			}
+			// jeśli warość wywyłań jest mniejsza od danej funkcji g(n) to uznajemy ze niepewna jest lepsza 
+			else if (niepewnaWartoscG < g_wartosc[sprawdzany])
+			{
+				czyNiepewnaLepsza = true;
+			}
+			//jeśli niepewna jest lepsza nadpisujemy wartości i dodajemy obecny element do tablicy poprzedników 
+			if (czyNiepewnaLepsza)
+			{
+				poprzednik[sprawdzany] = obecny;
+				g_wartosc[sprawdzany] = niepewnaWartoscG;
+				f_wartosc[sprawdzany] = g_wartosc[sprawdzany] + h_wartosc[sprawdzany];
+			}
+		}
+	}
+	cout << "Nie ma sciezki" << endl << endl;
+	return;
+}
+
+
 
 // przeszukiwanie w głąb grafu 
 void DFS(int poczatkowy, int koncowy)
 {
-	stos S,W; // stos sprawdzajacy
+	stos S, W; // stos sprawdzajacy
 	bool * odwiedzone, znaleziono; // tablica odwiedzonych pól i zmienna okeslajaca czy znaleziono szukane pole
-	int *P, v, u; // zmienne 
-	lista * pv; // lista pomocnicza wykożystana przy przeszukiwaniu sąsiadów 
+	int  v, u; // zmienne  
 
-	odwiedzone = new bool[wierzcholki]; // stworzenie tablicy elementów odwiedzonych
-	for (int i = 0; i < wierzcholki; i++)   // Tablicę odwiedzonych zerujemy
+	odwiedzone = new bool[WIERZCHOLKI]; // stworzenie tablicy elementów odwiedzonych
+	for (int i = 0; i < WIERZCHOLKI; i++)   // Tablicę odwiedzonych zerujemy
 		odwiedzone[i] = false;
 
 	// tworzymy tablice w której określimy który wierzchołek z którym "został połaczony scieżką" 
-	P = new int[wierzcholki];
+	//Poprzednicy = new int[WIERZCHOLKI];
 	// określamy pierwszy wierzchołęk do którego poszliśmy czyli wierzcholek startowy 
-	P[poczatkowy] = -1;
+	poprzednik[poczatkowy] = -1;
 	// dodanie pierwszego elementu na stos
-	S.push(poczatkowy); 
+	S.push(poczatkowy);
 	// pierwszy element jest odwiedzony 
 	odwiedzone[poczatkowy] = true;
 	//	pierwszy element nie jest szukanym 
 	znaleziono = false;
 
-	 // dopuki stos nie jest pusty 
+	// dopuki stos nie jest pusty 
 	while (!S.empty())
 	{
 		v = S.top();
@@ -257,49 +322,66 @@ void DFS(int poczatkowy, int koncowy)
 			break;
 		}
 		// sprawdzenie wszsytkich sasiadów elementu i dodanie ich na stos
-		for (pv = A[v]; pv; pv = pv->next)
+		for (int i = 0; i < (graf[v].size()); i++)
 		{
-			u = pv->K;
+			u = graf[v][i];
 			if (!odwiedzone[u])
 			{
-				P[u] = v;
+				poprzednik[u] = v;
 				S.push(u);
 				odwiedzone[u] = true;
 			}
 		}
+
 	}
 	// jeśli nie udało się znaleźć ścieżki 
-	if (!znaleziono) cout << "brak ścieżki";
+	if (!znaleziono) cout << "Nie ma sciezki" << endl << endl;
 
 	// jesli udało sie znaleźć ścieżke wypisujemy wynik 
 	else
 	{
-		// dopuki nie bedzie elementu 
+		// dopuki są poprzednicy
 		while (v > -1)
 		{
-			W.push(v);
-			v = P[v];
+			W.push(v); // zapisujemy na stos
+			v = poprzednik[v]; // przechodzimy na poprzednika
 		}
 		// wyświetlenie ścieżki w kolejnosci przechodzenia
-		while(!W.empty())
+		cout << "Sciezka DFS: ";
+		while (!W.empty())
 		{
-			cout << "Wartosc H: " << A[W.top()]->H << " dla wierzcholka: " << W.top() << endl;
+			cout << W.top() << "  ";
 			W.pop();
-			
+
 		}
-		cout << endl;
+		cout << endl << endl << endl;
 	}
-	// usuwanie tablic dynamicznych 
-	delete[] P;
+	// usuwanie tablicy dynamicznej 
 	delete[] odwiedzone;
 }
 
+/*********************************************************************************************************************************************************************/
+/*                                                                     Głowna część programu                                                                         */
+/*                                                                                                                                                                   */
+/*********************************************************************************************************************************************************************/
 int main()
 {
-	// tworzenie grafu 
-	tworzenie_grafu();
-	// szukanie ścieżki 
-	DFS(22, 7);
+
+	int pozycjaKrola = 7; // określenie pozycji króla
+	int pozycjaSkoczka = 22; // określenie pozycji skocznka
+
+	zbudujGraf(); // tworzenie grafu uzywanego przez poniższe algorytmy
+
+	//wyswietlGraf(); // wyświetlanie stworzonego grafu
+
+	// szukanie ścieżki DFS
+	DFS(pozycjaSkoczka, pozycjaKrola);
+
+	// szukanie ścieżki A*
+	AStar(pozycjaSkoczka, pozycjaKrola);
+
+	// usuwanie dynamicznych struktur
+	usunGraf();
 
 	return 0;
 }
