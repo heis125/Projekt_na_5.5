@@ -139,7 +139,7 @@ void zbudujGraf()
 				int nowy_y = j + dx[k];
 				if (nowy_x >= 0 && nowy_x <= 4 && nowy_y >= 0 && nowy_y <= 4)// musi stać na planszy 
 				{
-					if ((nowy_y != y_wieży && nowy_x != x_wieży) || (nowy_y == y_wieży && nowy_x == x_wieży))  // nie może stać w tej samej kolumnie ani wierszu co wieża ale może  stać na polu wieży 
+					if ((nowy_y != y_wieży && nowy_x != x_wieży) || (nowy_y == y_wieży && nowy_x == x_wieży))  // nie może stać w tej samej kolumnie ani wierszu co wieża ale może ją zbić
 					{
 						graf[tab[i][j]].push_back(tab[nowy_x][nowy_y]); // jeśli wszsytkie warunki spełnione dodajemy do grafu
 					}
